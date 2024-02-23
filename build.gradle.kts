@@ -106,13 +106,39 @@ java {
 publishing {
 	publications {
 		register<MavenPublication>("Maven") {
+			groupId = project.group.toString()
+			artifactId = archives_base_name
+			version = project.version.toString()
+
+			pom {
+				name = "Classic Blunders"
+				description = "A library mod for simple shared functionality between Imperium mods"
+				url = "https://imperium.stultorum.com"
+				licenses {
+					name = "LGPL-3.0"
+					url = "https://www.gnu.org/licenses/lgpl-3.0.txt"
+				}
+				scm {
+					connection = "scm:git:git://github.com/ImperiumStultorum/ClassicBlunders.git"
+					developerConnection = "scm:git:ssh://git@github.com/ImperiumStultorum/ClassicBlunders.git"
+					url = "https://github.com/ImperiumStultorum/ClassicBlunders"
+				}
+			}
+
 			from(components.getByName("java"))
 		}
 	}
 
 	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
 	repositories {
-		// repositories to publish to
-
+		// In gradle publish, use -PimperiumMavenUsername={token} -PimperiumMavenPassword={secret}
+		maven {
+			name = "imperiumMaven"
+			url = uri("https://maven.stultorum.com/releases")
+			credentials(PasswordCredentials::class)
+			authentication {
+				create<BasicAuthentication>("basic")
+			}
+		}
 	}
 }
