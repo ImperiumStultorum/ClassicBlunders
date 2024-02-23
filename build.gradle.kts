@@ -20,7 +20,7 @@ repositories {
 }
 
 loom {
-	accessWidenerPath = file("src/main/resources/adverse.accesswidener")
+	accessWidenerPath = file("src/main/resources/blunders.accesswidener")
     mods {
         
     }
