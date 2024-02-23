@@ -15,4 +15,4 @@ pluginManagement {
 	}
 }
 
-rootProject.name = "adverse"
+rootProject.name = "classicBlunders"
