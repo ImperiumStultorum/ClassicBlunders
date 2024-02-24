@@ -3,67 +3,99 @@
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+//public val getPropStr: (String) -> String = {property(it).toString()}
+//public val getVer: (String) -> String = {getPropStr("v${it.replaceFirstChar(Char::uppercaseChar)}")}
+
+fun getPropStr(name: String): String = property(name).toString()
+fun getVer(name: String): String = getPropStr("v${name.replaceFirstChar(Char::uppercaseChar)}")
+
+val snapshotRegex = Regex("-((beta)|(alpha))$")
+val javaVer = JavaVersion.toVersion(getVer("java"))
+val id = getPropStr("id")
+
+// ordinal + 1 is how javaVer.majorVersion is calculated, and saves needless string conversion
+fun JavaVersion.toInt() = this.ordinal + 1
+
 plugins {
 	java
 	`maven-publish`
 
-	alias(libs.plugins.kotlin)
-	alias(libs.plugins.quilt.loom)
+	// for some godforsaken reason you can't seem to access properties in `plugins`, so here and only here has constants.
+	id("org.jetbrains.kotlin.jvm").version("1.9.10")
+	id("org.quiltmc.loom").version("1.+")
 }
-
-val archives_base_name: String by project
-
-val javaVersion = 17
 
 repositories {
 
 }
 
 loom {
-	accessWidenerPath = file("src/main/resources/blunders.accesswidener")
+	accessWidenerPath = file("src/main/resources/$id.accesswidener")
     mods {
-        
+
     }
 }
 
-// All the dependencies are declared at gradle/libs.version.toml and referenced with "libs.<id>"
-// See https://docs.gradle.org/current/userguide/platforms.html for information on how version catalogs work.
 dependencies {
-	minecraft(libs.minecraft)
-	mappings(
-		variantOf(libs.quilt.mappings) {
-			classifier("intermediary-v2")
-		}
-	)
+	val minecraftVer = getVer("minecraft")
+	minecraft("com.mojang:minecraft:$minecraftVer")
+	mappings("org.quiltmc:quilt-mappings:$minecraftVer+build.${getVer("mappings")}:intermediary-v2")
 
-	modImplementation(libs.quilt.loader)
-	modImplementation(libs.qfapi)
-	modImplementation(libs.qkl)
+	modImplementation("org.quiltmc:quilt-loader:${getVer("loader")}")
+	modImplementation("org.quiltmc.quilted-fabric-api:quilted-fabric-api:${getVer("QFAPI")}+${getVer("FAPI")}-$minecraftVer")
+
+	val qklVer = getVer("QKL")
+	val ktVer = getVer("kotlin")
+	val flkVer = getVer("FLK")
+	modImplementation("org.quiltmc.quilt-kotlin-libraries:quilt-kotlin-libraries:$qklVer+kt.$ktVer+flk.$flkVer")
+	modImplementation("org.quiltmc.quilt-kotlin-libraries:core:$qklVer+kt.$ktVer+flk.$flkVer")
+	modImplementation("org.quiltmc.quilt-kotlin-libraries:library:$qklVer+kt.$ktVer+flk.$flkVer")
 }
 
 tasks {
 	withType<KotlinCompile> {
 		kotlinOptions {
-			jvmTarget = javaVersion.toString()
+			jvmTarget = javaVer.majorVersion
 			// languageVersion: A.B of the kotlin plugin version A.B.C
-			languageVersion = libs.plugins.kotlin.get().version.requiredVersion.substringBeforeLast('.')
+			languageVersion = getVer("kotlin").substringBeforeLast('.')
 		}
 	}
 
 	withType<JavaCompile>.configureEach {
 		options.encoding = "UTF-8"
 		options.isDeprecation = true
-		options.release.set(javaVersion)
+		options.release.set(javaVer.toInt())
+	}
+
+	named("publish") {
+		enabled = false
+	}
+	register("publishRelease") {
+		dependsOn("publish${rootProject.name.replaceFirstChar(Char::uppercaseChar)}PublicationToReleaseRepository")
+	}
+	register("publishBeta") {
+		if (!project.version.toString().matches(snapshotRegex)) throw GradleException("Beta publication doesn't match snapshot regex")
+		dependsOn("publish${rootProject.name.replaceFirstChar(Char::uppercaseChar)}PublicationToSnapshotRepository")
 	}
 
 	processResources {
 		filteringCharset = "UTF-8"
-		inputs.property("version", project.version)
 
-		filesMatching("quilt.mod.json") {
+		filesMatching("quilt.mod.json5") {
 			expand(
 				mapOf(
-					"version" to project.version
+					"group" to project.group,
+					"name" to id,
+					"version" to project.version,
+					"mainClass" to getPropStr("mainClass"),
+					"prettyName" to getPropStr("prettyName"),
+					"desc" to getPropStr("desc"),
+					"homePage" to getPropStr("homeUrl"),
+					"repoPage" to "https://${getPropStr("repoUrn")}",
+					"vLoader" to getVer("loader"),
+					"vQFAPI" to getVer("QFAPI"),
+					"vQKL" to getVer("QKL"),
+					"vMinecraft" to getVer("minecraft")
 				)
 			)
 		}
@@ -81,17 +113,16 @@ tasks {
 
 	jar {
 		from("LICENSE") {
-			rename { "LICENSE_${archives_base_name}" }
+			rename { "LICENSE_${id}" }
 		}
 	}
 }
 
-val targetJavaVersion = JavaVersion.toVersion(javaVersion)
-if (JavaVersion.current() < targetJavaVersion) {
-	kotlin.jvmToolchain(javaVersion)
+if (JavaVersion.current() < javaVer) {
+	kotlin.jvmToolchain(javaVer.toInt())
 
 	java.toolchain {
-		languageVersion.set(JavaLanguageVersion.of(javaVersion))
+		languageVersion.set(JavaLanguageVersion.of(javaVer.toInt()))
 	}
 }
 
@@ -99,29 +130,32 @@ java {
 	withSourcesJar()
 	withJavadocJar()
 
-	sourceCompatibility = targetJavaVersion
-	targetCompatibility = targetJavaVersion
+	sourceCompatibility = javaVer
+	targetCompatibility = javaVer
 }
+
 
 publishing {
 	publications {
-		register<MavenPublication>("Maven") {
+		register<MavenPublication>(rootProject.name) {
 			groupId = project.group.toString()
-			artifactId = archives_base_name
+			artifactId = id
 			version = project.version.toString()
 
 			pom {
-				name = "Classic Blunders"
+				val repoUrn = getPropStr("repoUrn")
+
+				name = getPropStr("prettyName")
 				description = "A library mod for simple shared functionality between Imperium mods"
-				url = "https://imperium.stultorum.com"
+				url = getPropStr("homeUrl")
 				licenses {
 					name = "LGPL-3.0"
 					url = "https://www.gnu.org/licenses/lgpl-3.0.txt"
 				}
 				scm {
-					connection = "scm:git:git://github.com/ImperiumStultorum/ClassicBlunders.git"
-					developerConnection = "scm:git:ssh://git@github.com/ImperiumStultorum/ClassicBlunders.git"
-					url = "https://github.com/ImperiumStultorum/ClassicBlunders"
+					connection = "scm:git:git://${repoUrn}.git"
+					developerConnection = "scm:git:ssh://git@${repoUrn}.git"
+					url = "https://${repoUrn}"
 				}
 			}
 
@@ -129,12 +163,21 @@ publishing {
 		}
 	}
 
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+	//See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
 	repositories {
-		// In gradle publish, use -PimperiumMavenUsername={token} -PimperiumMavenPassword={secret}
+        // In gradle publish, use -PreleaseUsername={token} -PreleasePassword={secret}
 		maven {
-			name = "imperiumMaven"
+			name = "release"
 			url = uri("https://maven.stultorum.com/releases")
+			credentials(PasswordCredentials::class)
+			authentication {
+				create<BasicAuthentication>("basic")
+			}
+		}
+		// In gradle publish, use -PsnapshotUsername={token} -PsnapshotPassword={secret}
+		maven {
+			name = "snapshot"
+			url = uri("https://maven.stultorum.com/snapshots")
 			credentials(PasswordCredentials::class)
 			authentication {
 				create<BasicAuthentication>("basic")
@@ -142,3 +185,4 @@ publishing {
 		}
 	}
 }
+
