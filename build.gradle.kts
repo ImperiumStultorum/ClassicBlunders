@@ -3,9 +3,6 @@
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-//public val getPropStr: (String) -> String = {property(it).toString()}
-//public val getVer: (String) -> String = {getPropStr("v${it.replaceFirstChar(Char::uppercaseChar)}")}
-
 fun getPropStr(name: String): String = property(name).toString()
 fun getVer(name: String): String = getPropStr("v${name.replaceFirstChar(Char::uppercaseChar)}")
 
