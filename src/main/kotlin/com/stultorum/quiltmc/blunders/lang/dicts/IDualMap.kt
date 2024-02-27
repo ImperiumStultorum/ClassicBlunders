@@ -1,4 +1,4 @@
-package com.stultorum.blunders.lang.dicts
+package com.stultorum.quiltmc.blunders.lang.dicts
 
 /**
  * Note: There should never be a case where K1 has a value of which K2 does not have a corresponding key.

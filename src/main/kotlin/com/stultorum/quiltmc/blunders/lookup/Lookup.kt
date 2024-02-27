@@ -1,7 +1,7 @@
-package com.stultorum.blunders.lookup
+package com.stultorum.quiltmc.blunders.lookup
 
-import com.stultorum.blunders.lang.exceptions.AlreadyRegisteredException
-import com.stultorum.blunders.lang.exceptions.NotRegisteredException
+import com.stultorum.quiltmc.blunders.lang.exceptions.AlreadyRegisteredException
+import com.stultorum.quiltmc.blunders.lang.exceptions.NotRegisteredException
 
 class Lookup<TKey, TObj: IRetrievable<TKey>>(private val map: HashMap<TKey, TObj> = HashMap()) {
 

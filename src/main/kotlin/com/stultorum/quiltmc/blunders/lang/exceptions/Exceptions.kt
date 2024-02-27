@@ -1,4 +1,4 @@
-package com.stultorum.blunders.lang.exceptions
+package com.stultorum.quiltmc.blunders.lang.exceptions
 
 // There has to be an easier way to do this
 

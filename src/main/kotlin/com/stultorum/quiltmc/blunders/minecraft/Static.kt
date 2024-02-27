@@ -1,4 +1,4 @@
-package com.stultorum.blunders.minecraft
+package com.stultorum.quiltmc.blunders.minecraft
 
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World

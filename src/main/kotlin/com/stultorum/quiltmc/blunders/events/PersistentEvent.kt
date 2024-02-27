@@ -1,8 +1,8 @@
-package com.stultorum.blunders.events
+package com.stultorum.quiltmc.blunders.events
 
-import com.stultorum.blunders.lang.Bool
-import com.stultorum.blunders.lang.exceptions.AlreadyRegisteredException
-import com.stultorum.blunders.lang.exceptions.NotRegisteredException
+import com.stultorum.quiltmc.blunders.lang.Bool
+import com.stultorum.quiltmc.blunders.lang.exceptions.AlreadyRegisteredException
+import com.stultorum.quiltmc.blunders.lang.exceptions.NotRegisteredException
 
 open class PersistentEvent<Persist> {
     protected val callbacks: MutableSet<Pair<Persist, (Persist) -> Unit>> = HashSet()

@@ -1,4 +1,4 @@
-package com.stultorum.blunders.lookup
+package com.stultorum.quiltmc.blunders.lookup
 
 /**
  * This literally only exists because of JVM type erasure.

@@ -1,9 +1,9 @@
-package com.stultorum.blunders.lookup
+package com.stultorum.quiltmc.blunders.lookup
 
-import com.stultorum.blunders.lang.dicts.IDualMap
-import com.stultorum.blunders.lang.dicts.MetaDualMap
-import com.stultorum.blunders.lang.exceptions.AlreadyRegisteredException
-import com.stultorum.blunders.lang.exceptions.NotRegisteredException
+import com.stultorum.quiltmc.blunders.lang.dicts.IDualMap
+import com.stultorum.quiltmc.blunders.lang.dicts.MetaDualMap
+import com.stultorum.quiltmc.blunders.lang.exceptions.AlreadyRegisteredException
+import com.stultorum.quiltmc.blunders.lang.exceptions.NotRegisteredException
 
 class DualLookup<TKey1, TKey2, TObj>(private val map: IDualMap<TKey1, TKey2, TObj> = MetaDualMap()) where TObj: IRetrievable<TKey1>, TObj: IRetrievable2<TKey2> {
     fun register(obj: TObj) {

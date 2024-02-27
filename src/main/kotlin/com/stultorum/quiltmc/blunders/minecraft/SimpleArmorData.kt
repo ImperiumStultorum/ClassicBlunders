@@ -1,4 +1,4 @@
-package com.stultorum.blunders.minecraft
+package com.stultorum.quiltmc.blunders.minecraft
 
 import net.minecraft.item.ArmorItem
 import net.minecraft.item.ArmorMaterial

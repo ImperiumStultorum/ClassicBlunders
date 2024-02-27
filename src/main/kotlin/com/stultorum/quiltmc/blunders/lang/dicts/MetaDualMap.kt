@@ -1,4 +1,4 @@
-package com.stultorum.blunders.lang.dicts
+package com.stultorum.quiltmc.blunders.lang.dicts
 
 open class MetaDualMap<K1, K2, V>: IDualMap<K1, K2, V> {
     private val mapK1 = HashMap<K1, Int>()
