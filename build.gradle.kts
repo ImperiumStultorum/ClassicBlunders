@@ -143,7 +143,7 @@ publishing {
 				val repoUrn = getPropStr("repoUrn")
 
 				name = getPropStr("prettyName")
-				description = "A library mod for simple shared functionality between Imperium mods"
+				description = getPropStr("desc")
 				url = getPropStr("homeUrl")
 				licenses {
 					name = "LGPL-3.0"
