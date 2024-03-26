@@ -44,6 +44,7 @@ dependencies {
 	val qklVer = getVer("QKL")
 	val ktVer = getVer("kotlin")
 	val flkVer = getVer("FLK")
+	implementation("org.jetbrains.kotlin:kotlin-reflect:$ktVer")
 	modImplementation("org.quiltmc.quilt-kotlin-libraries:quilt-kotlin-libraries:$qklVer+kt.$ktVer+flk.$flkVer")
 	modImplementation("org.quiltmc.quilt-kotlin-libraries:core:$qklVer+kt.$ktVer+flk.$flkVer")
 	modImplementation("org.quiltmc.quilt-kotlin-libraries:library:$qklVer+kt.$ktVer+flk.$flkVer")
@@ -77,8 +78,9 @@ tasks {
 
 	processResources {
 		filteringCharset = "UTF-8"
+		duplicatesStrategy = DuplicatesStrategy.INCLUDE
 
-		filesMatching("quilt.mod.json5") {
+		filesMatching("quilt.mod.json") {
 			expand(
 				mapOf(
 					"group" to project.group,
