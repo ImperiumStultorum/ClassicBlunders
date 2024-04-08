@@ -1,9 +1,9 @@
 package com.stultorum.quiltmc.blunders.lang.dicts
 
 open class MetaDualMap<K1, K2, V>: IDualMap<K1, K2, V> {
-    private val mapK1 = HashMap<K1, Int>()
-    private val mapK2 = HashMap<K2, Int>()
-    private val mapV  = HashMap<Int,  V>()
+    protected val mapK1 = HashMap<K1, Int>()
+    protected val mapK2 = HashMap<K2, Int>()
+    protected val mapV  = HashMap<Int,  V>()
     
     override val k1s: Set<K1> = mapK1.keys
     override val k2s: Set<K2> = mapK2.keys

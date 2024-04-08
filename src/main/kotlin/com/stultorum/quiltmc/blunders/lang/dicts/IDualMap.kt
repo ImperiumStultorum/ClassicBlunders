@@ -1,5 +1,7 @@
 package com.stultorum.quiltmc.blunders.lang.dicts
 
+import com.stultorum.quiltmc.blunders.lang.Bool
+
 /**
  * Note: There should never be a case where K1 has a value of which K2 does not have a corresponding key.
  * If this happens, it will cause unintended behavior.
@@ -18,6 +20,9 @@ interface IDualMap<K1, K2, V> {
         put(k1, k2, v)
         return@run null
     }
+
+    fun containsK1(k1: K1): Bool = k1s.contains(k1)
+    fun containsK2(k2: K2): Bool = k2s.contains(k2)
     
     @JvmName("_getK1")
     @Suppress("INAPPLICABLE_JVM_NAME")

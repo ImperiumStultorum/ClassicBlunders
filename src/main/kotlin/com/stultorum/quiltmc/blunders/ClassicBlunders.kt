@@ -5,6 +5,6 @@ import org.quiltmc.qsl.base.api.entrypoint.ModInitializer
 
 internal class ClassicBlunders : ModInitializer {
     override fun onInitialize(mod: ModContainer?) {
-        
+
     }
 }

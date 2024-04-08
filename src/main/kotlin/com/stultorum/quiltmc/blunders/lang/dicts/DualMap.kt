@@ -1,8 +1,8 @@
 package com.stultorum.quiltmc.blunders.lang.dicts
 
 open class DualMap<K1, K2, V>: IDualMap<K1, K2, V> {
-    private val mapK1 = HashMap<K1, V>()
-    private val mapK2 = HashMap<K2, V>()
+    protected val mapK1 = HashMap<K1, V>()
+    protected val mapK2 = HashMap<K2, V>()
     
     override val k1s: Set<K1> = mapK1.keys
     override val k2s: Set<K2> = mapK2.keys
